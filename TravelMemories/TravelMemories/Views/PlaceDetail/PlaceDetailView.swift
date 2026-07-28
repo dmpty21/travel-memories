@@ -8,6 +8,8 @@ struct PlaceDetailView: View {
     @State private var isPresentingEditPlace = false
     @State private var isPresentingAddRecommendation = false
     @State private var recommendationToEdit: Recommendation?
+    @State private var isPresentingAddNote = false
+    @State private var noteToEdit: LogisticsNote?
 
     private var groupedRecommendations: [(category: RecommendationCategory, items: [Recommendation])] {
         let groups = Dictionary(grouping: place.recommendations, by: \.category)
@@ -15,6 +17,10 @@ struct PlaceDetailView: View {
             guard let items = groups[category], !items.isEmpty else { return nil }
             return (category, items.sorted { $0.name < $1.name })
         }
+    }
+
+    private var sortedLogisticsNotes: [LogisticsNote] {
+        place.logisticsNotes.sorted { $0.createdAt < $1.createdAt }
     }
 
     var body: some View {
@@ -41,8 +47,24 @@ struct PlaceDetailView: View {
             }
 
             Section("Logistics Notes") {
-                Text("Coming soon")
-                    .foregroundStyle(.secondary)
+                if sortedLogisticsNotes.isEmpty {
+                    Text("No logistics notes yet")
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(sortedLogisticsNotes) { note in
+                        Text(note.text)
+                            .onTapGesture { noteToEdit = note }
+                    }
+                    .onDelete { offsets in
+                        delete(notes: sortedLogisticsNotes, at: offsets)
+                    }
+                }
+
+                Button {
+                    isPresentingAddNote = true
+                } label: {
+                    Label("Add Logistics Note", systemImage: "plus")
+                }
             }
         }
         .navigationTitle(place.city)
@@ -74,11 +96,23 @@ struct PlaceDetailView: View {
         .sheet(item: $recommendationToEdit) { recommendation in
             AddEditRecommendationView(place: place, recommendation: recommendation)
         }
+        .sheet(isPresented: $isPresentingAddNote) {
+            AddEditLogisticsNoteView(place: place)
+        }
+        .sheet(item: $noteToEdit) { note in
+            AddEditLogisticsNoteView(place: place, logisticsNote: note)
+        }
     }
 
     private func delete(recommendationsInGroup: [Recommendation], at offsets: IndexSet) {
         for index in offsets {
             modelContext.delete(recommendationsInGroup[index])
+        }
+    }
+
+    private func delete(notes: [LogisticsNote], at offsets: IndexSet) {
+        for index in offsets {
+            modelContext.delete(notes[index])
         }
     }
 }
