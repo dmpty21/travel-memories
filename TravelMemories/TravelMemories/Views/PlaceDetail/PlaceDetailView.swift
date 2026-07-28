@@ -3,15 +3,43 @@ import SwiftData
 
 struct PlaceDetailView: View {
     @Bindable var place: Place
+    @Environment(\.modelContext) private var modelContext
 
-    @State private var isPresentingEdit = false
+    @State private var isPresentingEditPlace = false
+    @State private var isPresentingAddRecommendation = false
+    @State private var recommendationToEdit: Recommendation?
+
+    private var groupedRecommendations: [(category: RecommendationCategory, items: [Recommendation])] {
+        let groups = Dictionary(grouping: place.recommendations, by: \.category)
+        return RecommendationCategory.allCases.compactMap { category in
+            guard let items = groups[category], !items.isEmpty else { return nil }
+            return (category, items.sorted { $0.name < $1.name })
+        }
+    }
 
     var body: some View {
         List {
-            Section("Recommendations") {
-                Text("Coming soon")
-                    .foregroundStyle(.secondary)
+            if place.recommendations.isEmpty {
+                Section("Recommendations") {
+                    Text("No recommendations yet")
+                        .foregroundStyle(.secondary)
+                }
+            } else {
+                ForEach(groupedRecommendations, id: \.category) { group in
+                    Section {
+                        ForEach(group.items) { recommendation in
+                            RecommendationRow(recommendation: recommendation)
+                                .onTapGesture { recommendationToEdit = recommendation }
+                        }
+                        .onDelete { offsets in
+                            delete(recommendationsInGroup: group.items, at: offsets)
+                        }
+                    } header: {
+                        Label(group.category.displayName, systemImage: group.category.symbolName)
+                    }
+                }
             }
+
             Section("Logistics Notes") {
                 Text("Coming soon")
                     .foregroundStyle(.secondary)
@@ -19,12 +47,38 @@ struct PlaceDetailView: View {
         }
         .navigationTitle(place.city)
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button("Edit") { isPresentingEdit = true }
+            ToolbarItemGroup(placement: .primaryAction) {
+                Button {
+                    isPresentingAddRecommendation = true
+                } label: {
+                    Label("Add Recommendation", systemImage: "plus")
+                }
+
+                Menu {
+                    Button {
+                        isPresentingEditPlace = true
+                    } label: {
+                        Label("Edit Place", systemImage: "pencil")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
             }
         }
-        .sheet(isPresented: $isPresentingEdit) {
+        .sheet(isPresented: $isPresentingEditPlace) {
             AddEditPlaceView(place: place)
+        }
+        .sheet(isPresented: $isPresentingAddRecommendation) {
+            AddEditRecommendationView(place: place)
+        }
+        .sheet(item: $recommendationToEdit) { recommendation in
+            AddEditRecommendationView(place: place, recommendation: recommendation)
+        }
+    }
+
+    private func delete(recommendationsInGroup: [Recommendation], at offsets: IndexSet) {
+        for index in offsets {
+            modelContext.delete(recommendationsInGroup[index])
         }
     }
 }
