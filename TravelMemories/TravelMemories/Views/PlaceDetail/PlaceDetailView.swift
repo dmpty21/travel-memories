@@ -70,6 +70,10 @@ struct PlaceDetailView: View {
         .navigationTitle(place.city)
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
+                ShareLink(item: place.shareText) {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                }
+
                 Button {
                     isPresentingAddRecommendation = true
                 } label: {
