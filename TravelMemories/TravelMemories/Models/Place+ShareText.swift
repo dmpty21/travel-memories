@@ -28,6 +28,9 @@ extension Place {
                 } else {
                     lines.append("\(bullet) \(item.name) — \(note)")
                 }
+                if let address = item.address, !address.isEmpty {
+                    lines.append("   \(address)")
+                }
             }
         }
 

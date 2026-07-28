@@ -14,6 +14,12 @@ struct RecommendationRow: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
                 }
+                if let address = recommendation.address, !address.isEmpty {
+                    Label(address, systemImage: "mappin.and.ellipse")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .lineLimit(1)
+                }
             }
             Spacer(minLength: 8)
             if recommendation.isFavorite {

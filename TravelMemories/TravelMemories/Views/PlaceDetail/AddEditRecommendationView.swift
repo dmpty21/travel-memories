@@ -1,9 +1,12 @@
 import SwiftUI
 import SwiftData
+import MapKit
+import Contacts
 
 struct AddEditRecommendationView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
 
     var place: Place
     var recommendation: Recommendation?
@@ -12,8 +15,22 @@ struct AddEditRecommendationView: View {
     @State private var note: String = ""
     @State private var category: RecommendationCategory = .restaurant
     @State private var isFavorite: Bool = false
+    @State private var address: String = ""
+    @State private var latitude: Double?
+    @State private var longitude: Double?
+    @State private var isPresentingLookup = false
 
     private var isEditing: Bool { recommendation != nil }
+
+    private var mapsURL: URL? {
+        guard let latitude, let longitude else { return nil }
+        var components = URLComponents(string: "http://maps.apple.com/")
+        components?.queryItems = [
+            URLQueryItem(name: "ll", value: "\(latitude),\(longitude)"),
+            URLQueryItem(name: "q", value: name)
+        ]
+        return components?.url
+    }
 
     var body: some View {
         NavigationStack {
@@ -31,6 +48,25 @@ struct AddEditRecommendationView: View {
                     .lineLimit(3...6)
 
                 Toggle("Favorite", isOn: $isFavorite)
+
+                Section {
+                    Button {
+                        isPresentingLookup = true
+                    } label: {
+                        Label("Look Up Place on Maps", systemImage: "map")
+                    }
+
+                    TextField("Address", text: $address, axis: .vertical)
+                        .lineLimit(2...4)
+
+                    if let mapsURL {
+                        Button {
+                            openURL(mapsURL)
+                        } label: {
+                            Label("Open in Maps", systemImage: "arrow.up.right.square")
+                        }
+                    }
+                }
             }
             .navigationTitle(isEditing ? "Edit Recommendation" : "Add Recommendation")
             .toolbar {
@@ -48,26 +84,58 @@ struct AddEditRecommendationView: View {
                     note = recommendation.note
                     category = recommendation.category
                     isFavorite = recommendation.isFavorite
+                    address = recommendation.address ?? ""
+                    latitude = recommendation.latitude
+                    longitude = recommendation.longitude
+                }
+            }
+            .sheet(isPresented: $isPresentingLookup) {
+                PlaceLookupSheet(cityName: place.city, country: place.country) { mapItem in
+                    applyLookup(mapItem)
                 }
             }
         }
     }
 
+    private func applyLookup(_ mapItem: MKMapItem) {
+        if let mapItemName = mapItem.name, !mapItemName.isEmpty {
+            name = mapItemName
+        }
+        address = formattedAddress(from: mapItem.placemark)
+        latitude = mapItem.placemark.coordinate.latitude
+        longitude = mapItem.placemark.coordinate.longitude
+    }
+
+    private func formattedAddress(from placemark: MKPlacemark) -> String {
+        if let postalAddress = placemark.postalAddress {
+            return CNPostalAddressFormatter.string(from: postalAddress, style: .mailingAddress)
+                .replacingOccurrences(of: "\n", with: ", ")
+        }
+        return placemark.title ?? ""
+    }
+
     private func save() {
         let trimmedName = name.trimmingCharacters(in: .whitespaces)
+        let trimmedAddress = address.trimmingCharacters(in: .whitespacesAndNewlines)
 
         if let recommendation {
             recommendation.name = trimmedName
             recommendation.note = note
             recommendation.category = category
             recommendation.isFavorite = isFavorite
+            recommendation.address = trimmedAddress.isEmpty ? nil : trimmedAddress
+            recommendation.latitude = latitude
+            recommendation.longitude = longitude
         } else {
             let newRecommendation = Recommendation(
                 name: trimmedName,
                 note: note,
                 category: category,
                 isFavorite: isFavorite,
-                place: place
+                place: place,
+                address: trimmedAddress.isEmpty ? nil : trimmedAddress,
+                latitude: latitude,
+                longitude: longitude
             )
             modelContext.insert(newRecommendation)
         }
