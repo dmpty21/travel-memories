@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import MapKit
 
 struct AddEditPlaceView: View {
     @Environment(\.modelContext) private var modelContext
@@ -9,6 +10,8 @@ struct AddEditPlaceView: View {
 
     @State private var country: String = ""
     @State private var city: String = ""
+    @StateObject private var searchCompleter = CitySearchCompleter()
+    @FocusState private var isCityFieldFocused: Bool
 
     private var isEditing: Bool { place != nil }
 
@@ -16,7 +19,30 @@ struct AddEditPlaceView: View {
         NavigationStack {
             Form {
                 TextField("Country", text: $country)
+
                 TextField("City", text: $city)
+                    .focused($isCityFieldFocused)
+                    .onChange(of: city) { _, newValue in
+                        searchCompleter.updateQuery(newValue)
+                    }
+
+                if isCityFieldFocused && !searchCompleter.suggestions.isEmpty {
+                    ForEach(searchCompleter.suggestions, id: \.self) { suggestion in
+                        Button {
+                            select(suggestion)
+                        } label: {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(suggestion.title)
+                                    .foregroundStyle(.primary)
+                                if !suggestion.subtitle.isEmpty {
+                                    Text(suggestion.subtitle)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
+                }
             }
             .navigationTitle(isEditing ? "Edit Place" : "Add Place")
             .toolbar {
@@ -33,6 +59,25 @@ struct AddEditPlaceView: View {
                 if let place {
                     country = place.country
                     city = place.city
+                }
+            }
+        }
+    }
+
+    private func select(_ suggestion: MKLocalSearchCompletion) {
+        isCityFieldFocused = false
+        searchCompleter.clear()
+
+        let request = MKLocalSearch.Request(completion: suggestion)
+        let search = MKLocalSearch(request: request)
+
+        Task {
+            guard let response = try? await search.start(),
+                  let placemark = response.mapItems.first?.placemark else { return }
+            await MainActor.run {
+                city = placemark.locality ?? suggestion.title
+                if let resolvedCountry = placemark.country {
+                    country = resolvedCountry
                 }
             }
         }
