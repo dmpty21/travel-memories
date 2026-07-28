@@ -12,9 +12,10 @@ struct RecommendationRow: View {
                     Text(recommendation.note)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .lineLimit(2)
                 }
             }
-            Spacer()
+            Spacer(minLength: 8)
             if recommendation.isFavorite {
                 Image(systemName: "star.fill")
                     .foregroundStyle(.yellow)

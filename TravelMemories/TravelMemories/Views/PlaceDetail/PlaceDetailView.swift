@@ -26,9 +26,11 @@ struct PlaceDetailView: View {
     var body: some View {
         List {
             if place.recommendations.isEmpty {
-                Section("Recommendations") {
+                Section {
                     Text("No recommendations yet")
                         .foregroundStyle(.secondary)
+                } header: {
+                    Label("Recommendations", systemImage: "list.bullet")
                 }
             } else {
                 ForEach(groupedRecommendations, id: \.category) { group in
@@ -46,7 +48,7 @@ struct PlaceDetailView: View {
                 }
             }
 
-            Section("Logistics Notes") {
+            Section {
                 if sortedLogisticsNotes.isEmpty {
                     Text("No logistics notes yet")
                         .foregroundStyle(.secondary)
@@ -65,6 +67,8 @@ struct PlaceDetailView: View {
                 } label: {
                     Label("Add Logistics Note", systemImage: "plus")
                 }
+            } header: {
+                Label("Logistics Notes", systemImage: "airplane")
             }
         }
         .navigationTitle(place.city)
