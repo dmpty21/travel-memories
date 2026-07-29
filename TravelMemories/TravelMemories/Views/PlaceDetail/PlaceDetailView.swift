@@ -10,6 +10,7 @@ struct PlaceDetailView: View {
     @State private var recommendationToEdit: Recommendation?
     @State private var isPresentingAddNote = false
     @State private var noteToEdit: LogisticsNote?
+    @State private var isPresentingMap = false
 
     private var groupedRecommendations: [(category: RecommendationCategory, items: [Recommendation])] {
         let groups = Dictionary(grouping: place.recommendations, by: \.category)
@@ -79,6 +80,12 @@ struct PlaceDetailView: View {
                 }
 
                 Button {
+                    isPresentingMap = true
+                } label: {
+                    Label("Map", systemImage: "map")
+                }
+
+                Button {
                     isPresentingAddRecommendation = true
                 } label: {
                     Label("Add Recommendation", systemImage: "plus")
@@ -109,6 +116,9 @@ struct PlaceDetailView: View {
         }
         .sheet(item: $noteToEdit) { note in
             AddEditLogisticsNoteView(place: place, logisticsNote: note)
+        }
+        .sheet(isPresented: $isPresentingMap) {
+            PlaceMapView(place: place)
         }
     }
 
