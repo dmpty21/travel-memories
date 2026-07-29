@@ -7,7 +7,7 @@ final class Recommendation {
     var note: String
     var categoryRaw: String
     var isFavorite: Bool
-    var isVisited: Bool
+    var isVisited: Bool = false
     var createdAt: Date
     var place: Place?
 
