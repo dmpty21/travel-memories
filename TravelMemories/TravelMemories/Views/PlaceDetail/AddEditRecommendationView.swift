@@ -15,6 +15,7 @@ struct AddEditRecommendationView: View {
     @State private var note: String = ""
     @State private var category: RecommendationCategory = .restaurant
     @State private var isFavorite: Bool = false
+    @State private var isVisited: Bool = false
     @State private var rating: Int = 0
     @State private var address: String = ""
     @State private var latitude: Double?
@@ -49,6 +50,7 @@ struct AddEditRecommendationView: View {
                     .lineLimit(3...6)
 
                 Toggle("Favorite", isOn: $isFavorite)
+                Toggle("I've Been Here", isOn: $isVisited)
 
                 HStack {
                     Text("My Rating")
@@ -91,6 +93,7 @@ struct AddEditRecommendationView: View {
                     note = recommendation.note
                     category = recommendation.category
                     isFavorite = recommendation.isFavorite
+                    isVisited = recommendation.isVisited
                     rating = recommendation.rating ?? 0
                     address = recommendation.address ?? ""
                     latitude = recommendation.latitude
@@ -131,6 +134,7 @@ struct AddEditRecommendationView: View {
             recommendation.note = note
             recommendation.category = category
             recommendation.isFavorite = isFavorite
+            recommendation.isVisited = isVisited
             recommendation.rating = rating == 0 ? nil : rating
             recommendation.address = trimmedAddress.isEmpty ? nil : trimmedAddress
             recommendation.latitude = latitude
@@ -141,6 +145,7 @@ struct AddEditRecommendationView: View {
                 note: note,
                 category: category,
                 isFavorite: isFavorite,
+                isVisited: isVisited,
                 place: place,
                 address: trimmedAddress.isEmpty ? nil : trimmedAddress,
                 latitude: latitude,

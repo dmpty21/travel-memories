@@ -7,6 +7,7 @@ final class Recommendation {
     var note: String
     var categoryRaw: String
     var isFavorite: Bool
+    var isVisited: Bool
     var createdAt: Date
     var place: Place?
 
@@ -25,6 +26,7 @@ final class Recommendation {
         note: String,
         category: RecommendationCategory,
         isFavorite: Bool = false,
+        isVisited: Bool = false,
         place: Place? = nil,
         address: String? = nil,
         latitude: Double? = nil,
@@ -35,6 +37,7 @@ final class Recommendation {
         self.note = note
         self.categoryRaw = category.rawValue
         self.isFavorite = isFavorite
+        self.isVisited = isVisited
         self.createdAt = .now
         self.place = place
         self.address = address

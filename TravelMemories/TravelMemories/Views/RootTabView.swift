@@ -4,6 +4,9 @@ import SwiftData
 struct RootTabView: View {
     var body: some View {
         TabView {
+            Tab("Dashboard", systemImage: "chart.bar.xaxis") {
+                DashboardView()
+            }
             Tab("Places", systemImage: "map") {
                 PlacesListView()
             }

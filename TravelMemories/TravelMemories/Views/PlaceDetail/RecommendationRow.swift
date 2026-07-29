@@ -6,8 +6,15 @@ struct RecommendationRow: View {
     var body: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(recommendation.name)
-                    .font(.body)
+                HStack(spacing: 4) {
+                    Text(recommendation.name)
+                        .font(.body)
+                    if recommendation.isVisited {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                            .imageScale(.small)
+                    }
+                }
                 if !recommendation.note.trimmingCharacters(in: .whitespaces).isEmpty {
                     Text(recommendation.note)
                         .font(.caption)
