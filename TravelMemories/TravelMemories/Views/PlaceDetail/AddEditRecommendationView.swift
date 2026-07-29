@@ -15,6 +15,7 @@ struct AddEditRecommendationView: View {
     @State private var note: String = ""
     @State private var category: RecommendationCategory = .restaurant
     @State private var isFavorite: Bool = false
+    @State private var rating: Int = 0
     @State private var address: String = ""
     @State private var latitude: Double?
     @State private var longitude: Double?
@@ -48,6 +49,12 @@ struct AddEditRecommendationView: View {
                     .lineLimit(3...6)
 
                 Toggle("Favorite", isOn: $isFavorite)
+
+                HStack {
+                    Text("My Rating")
+                    Spacer()
+                    StarRatingControl(rating: $rating)
+                }
 
                 Section {
                     Button {
@@ -84,6 +91,7 @@ struct AddEditRecommendationView: View {
                     note = recommendation.note
                     category = recommendation.category
                     isFavorite = recommendation.isFavorite
+                    rating = recommendation.rating ?? 0
                     address = recommendation.address ?? ""
                     latitude = recommendation.latitude
                     longitude = recommendation.longitude
@@ -123,6 +131,7 @@ struct AddEditRecommendationView: View {
             recommendation.note = note
             recommendation.category = category
             recommendation.isFavorite = isFavorite
+            recommendation.rating = rating == 0 ? nil : rating
             recommendation.address = trimmedAddress.isEmpty ? nil : trimmedAddress
             recommendation.latitude = latitude
             recommendation.longitude = longitude
@@ -135,7 +144,8 @@ struct AddEditRecommendationView: View {
                 place: place,
                 address: trimmedAddress.isEmpty ? nil : trimmedAddress,
                 latitude: latitude,
-                longitude: longitude
+                longitude: longitude,
+                rating: rating == 0 ? nil : rating
             )
             modelContext.insert(newRecommendation)
         }

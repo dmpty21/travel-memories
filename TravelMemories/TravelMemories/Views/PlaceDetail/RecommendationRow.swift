@@ -22,10 +22,15 @@ struct RecommendationRow: View {
                 }
             }
             Spacer(minLength: 8)
-            if recommendation.isFavorite {
-                Image(systemName: "star.fill")
-                    .foregroundStyle(.yellow)
-                    .imageScale(.small)
+            VStack(alignment: .trailing, spacing: 4) {
+                if recommendation.isFavorite {
+                    Image(systemName: "star.fill")
+                        .foregroundStyle(.yellow)
+                        .imageScale(.small)
+                }
+                if let rating = recommendation.rating, rating > 0 {
+                    StarRatingView(rating: rating)
+                }
             }
         }
         .contentShape(Rectangle())

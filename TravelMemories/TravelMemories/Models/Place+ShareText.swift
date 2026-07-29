@@ -23,10 +23,11 @@ extension Place {
             for item in items {
                 let bullet = item.isFavorite ? "★" : "•"
                 let note = item.note.trimmingCharacters(in: .whitespacesAndNewlines)
+                let ratingSuffix = (item.rating.map { " (\(String(repeating: "★", count: $0))\(String(repeating: "☆", count: 5 - $0)))" }) ?? ""
                 if note.isEmpty {
-                    lines.append("\(bullet) \(item.name)")
+                    lines.append("\(bullet) \(item.name)\(ratingSuffix)")
                 } else {
-                    lines.append("\(bullet) \(item.name) — \(note)")
+                    lines.append("\(bullet) \(item.name)\(ratingSuffix) — \(note)")
                 }
                 if let address = item.address, !address.isEmpty {
                     lines.append("   \(address)")

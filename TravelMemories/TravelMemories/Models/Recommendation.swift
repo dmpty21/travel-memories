@@ -13,6 +13,7 @@ final class Recommendation {
     var address: String?
     var latitude: Double?
     var longitude: Double?
+    var rating: Int?
 
     var category: RecommendationCategory {
         get { RecommendationCategory(rawValue: categoryRaw) ?? .restaurant }
@@ -27,7 +28,8 @@ final class Recommendation {
         place: Place? = nil,
         address: String? = nil,
         latitude: Double? = nil,
-        longitude: Double? = nil
+        longitude: Double? = nil,
+        rating: Int? = nil
     ) {
         self.name = name
         self.note = note
@@ -38,5 +40,6 @@ final class Recommendation {
         self.address = address
         self.latitude = latitude
         self.longitude = longitude
+        self.rating = rating
     }
 }

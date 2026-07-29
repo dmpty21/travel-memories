@@ -109,6 +109,9 @@ private struct MapSelectionCard: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
                 }
+                if let rating = recommendation.rating, rating > 0 {
+                    StarRatingView(rating: rating)
+                }
             }
 
             Spacer(minLength: 8)
