@@ -7,6 +7,10 @@ final class Place {
     var city: String
     var createdAt: Date
 
+    var photoURL: String?
+    var photoPhotographer: String?
+    var photoPageURL: String?
+
     @Relationship(deleteRule: .cascade, inverse: \Recommendation.place)
     var recommendations: [Recommendation] = []
 

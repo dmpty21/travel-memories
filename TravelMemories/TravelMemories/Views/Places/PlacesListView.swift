@@ -29,7 +29,7 @@ struct PlacesListView: View {
                             Section(group.country) {
                                 ForEach(group.places) { place in
                                     NavigationLink(value: place) {
-                                        Text(place.city)
+                                        PlaceRow(place: place)
                                     }
                                 }
                                 .onDelete { offsets in

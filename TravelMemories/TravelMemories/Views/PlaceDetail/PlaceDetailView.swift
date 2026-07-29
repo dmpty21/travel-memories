@@ -26,6 +26,13 @@ struct PlaceDetailView: View {
 
     var body: some View {
         List {
+            if place.photoURL != nil {
+                Section {
+                    PlacePhotoHeader(place: place)
+                        .listRowInsets(EdgeInsets())
+                }
+            }
+
             if place.recommendations.isEmpty {
                 Section {
                     Text("No recommendations yet")
@@ -119,6 +126,9 @@ struct PlaceDetailView: View {
         }
         .sheet(isPresented: $isPresentingMap) {
             PlaceMapView(place: place)
+        }
+        .task {
+            await place.loadPhotoIfNeeded()
         }
     }
 
