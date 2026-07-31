@@ -43,7 +43,7 @@ struct DashboardView: View {
                 .padding()
             }
             .background(Color(uiColor: .systemGroupedBackground))
-            .navigationTitle("Dashboard")
+            .navigationTitle("Home")
         }
     }
 

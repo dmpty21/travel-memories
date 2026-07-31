@@ -4,14 +4,20 @@ import SwiftData
 struct RootTabView: View {
     var body: some View {
         TabView {
-            Tab("Dashboard", systemImage: "chart.bar.xaxis") {
+            Tab("Home", systemImage: "house.fill") {
                 DashboardView()
             }
             Tab("Places", systemImage: "map") {
                 PlacesListView()
             }
+            Tab("Trips", systemImage: "airplane") {
+                TripsView()
+            }
             Tab("Favorites", systemImage: "star") {
                 FavoritesView()
+            }
+            Tab("Profile", systemImage: "person.crop.circle") {
+                ProfileView()
             }
         }
     }
