@@ -10,7 +10,7 @@ struct PlaceMapView: View {
     @State private var selectedRecommendationID: PersistentIdentifier?
 
     private var pinned: [Recommendation] {
-        place.recommendations.filter { $0.latitude != nil && $0.longitude != nil }
+        (place.recommendations ?? []).filter { $0.latitude != nil && $0.longitude != nil }
     }
 
     private var selectedRecommendation: Recommendation? {

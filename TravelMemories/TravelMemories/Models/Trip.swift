@@ -11,7 +11,7 @@ final class Trip {
     var place: Place?
 
     @Relationship(deleteRule: .cascade, inverse: \TripItem.trip)
-    var items: [TripItem] = []
+    var items: [TripItem]?
 
     var type: TripType {
         get { TripType(rawValue: typeRaw) ?? .leisure }

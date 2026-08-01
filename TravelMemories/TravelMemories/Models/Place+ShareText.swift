@@ -4,7 +4,7 @@ extension Place {
     var shareText: String {
         var lines: [String] = ["\(city), \(country)"]
 
-        let sortedNotes = logisticsNotes.sorted { $0.createdAt < $1.createdAt }
+        let sortedNotes = (logisticsNotes ?? []).sorted { $0.createdAt < $1.createdAt }
         if !sortedNotes.isEmpty {
             lines.append("")
             lines.append("Logistics")
@@ -13,7 +13,7 @@ extension Place {
             }
         }
 
-        let groupedRecommendations = Dictionary(grouping: recommendations, by: \.category)
+        let groupedRecommendations = Dictionary(grouping: recommendations ?? [], by: \.category)
         for category in RecommendationCategory.allCases {
             guard let items = groupedRecommendations[category]?.sorted(by: { $0.name < $1.name }),
                   !items.isEmpty else { continue }

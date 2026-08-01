@@ -10,13 +10,13 @@ final class Place {
     @Attribute(.externalStorage) var photoData: Data?
 
     @Relationship(deleteRule: .cascade, inverse: \Recommendation.place)
-    var recommendations: [Recommendation] = []
+    var recommendations: [Recommendation]?
 
     @Relationship(deleteRule: .cascade, inverse: \LogisticsNote.place)
-    var logisticsNotes: [LogisticsNote] = []
+    var logisticsNotes: [LogisticsNote]?
 
     @Relationship(deleteRule: .nullify, inverse: \Trip.place)
-    var trips: [Trip] = []
+    var trips: [Trip]?
 
     init(country: String, city: String) {
         self.country = country

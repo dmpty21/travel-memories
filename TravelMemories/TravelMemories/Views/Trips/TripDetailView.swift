@@ -10,7 +10,7 @@ struct TripDetailView: View {
     @State private var itemToEdit: TripItem?
 
     private var groupedItems: [(category: RecommendationCategory, items: [TripItem])] {
-        let groups = Dictionary(grouping: trip.items, by: \.category)
+        let groups = Dictionary(grouping: trip.items ?? [], by: \.category)
         return RecommendationCategory.allCases.compactMap { category in
             guard let items = groups[category], !items.isEmpty else { return nil }
             return (category, items.sorted { $0.name < $1.name })
@@ -28,7 +28,7 @@ struct TripDetailView: View {
                 .font(.subheadline)
             }
 
-            if trip.items.isEmpty {
+            if (trip.items ?? []).isEmpty {
                 Section {
                     Text("No items yet")
                         .foregroundStyle(.secondary)

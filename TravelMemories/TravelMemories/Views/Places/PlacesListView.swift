@@ -120,7 +120,7 @@ struct PlacesListView: View {
                 }
             } message: {
                 if let placeToDelete {
-                    Text("This will also delete its \(placeToDelete.recommendations.count) recommendations and \(placeToDelete.logisticsNotes.count) logistics notes.")
+                    Text("This will also delete its \((placeToDelete.recommendations ?? []).count) recommendations and \((placeToDelete.logisticsNotes ?? []).count) logistics notes.")
                 }
             }
         }
@@ -128,7 +128,7 @@ struct PlacesListView: View {
 
     private func countrySubtitle(_ places: [Place]) -> String {
         let cityCount = places.count
-        let placeCount = places.reduce(0) { $0 + $1.recommendations.count }
+        let placeCount = places.reduce(0) { $0 + ($1.recommendations ?? []).count }
         let cityWord = cityCount == 1 ? "city" : "cities"
         let placeWord = placeCount == 1 ? "place" : "places"
         return "\(cityCount) \(cityWord) · \(placeCount) \(placeWord)"

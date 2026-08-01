@@ -13,7 +13,7 @@ struct PlaceDetailView: View {
     @State private var isPresentingMap = false
 
     private var groupedRecommendations: [(category: RecommendationCategory, items: [Recommendation])] {
-        let groups = Dictionary(grouping: place.recommendations, by: \.category)
+        let groups = Dictionary(grouping: place.recommendations ?? [], by: \.category)
         return RecommendationCategory.allCases.compactMap { category in
             guard let items = groups[category], !items.isEmpty else { return nil }
             return (category, items.sorted { $0.name < $1.name })
@@ -21,11 +21,11 @@ struct PlaceDetailView: View {
     }
 
     private var sortedLogisticsNotes: [LogisticsNote] {
-        place.logisticsNotes.sorted { $0.createdAt < $1.createdAt }
+        (place.logisticsNotes ?? []).sorted { $0.createdAt < $1.createdAt }
     }
 
     private var sortedTrips: [Trip] {
-        place.trips.sorted { $0.startDate > $1.startDate }
+        (place.trips ?? []).sorted { $0.startDate > $1.startDate }
     }
 
     var body: some View {
@@ -49,7 +49,7 @@ struct PlaceDetailView: View {
                 }
             }
 
-            if place.recommendations.isEmpty {
+            if (place.recommendations ?? []).isEmpty {
                 Section {
                     Text("No recommendations yet")
                         .foregroundStyle(.secondary)
