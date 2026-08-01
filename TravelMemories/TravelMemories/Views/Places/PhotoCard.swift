@@ -10,8 +10,13 @@ struct PhotoCard: View {
             photo
 
             LinearGradient(
-                colors: [.clear, .black.opacity(0.75)],
-                startPoint: .center,
+                stops: [
+                    .init(color: .clear, location: 0),
+                    .init(color: .black.opacity(0.15), location: 0.4),
+                    .init(color: .black.opacity(0.55), location: 0.75),
+                    .init(color: .black.opacity(0.9), location: 1)
+                ],
+                startPoint: .top,
                 endPoint: .bottom
             )
 
@@ -25,6 +30,7 @@ struct PhotoCard: View {
                     .foregroundStyle(.white.opacity(0.85))
                     .lineLimit(1)
             }
+            .shadow(color: .black.opacity(0.5), radius: 3, x: 0, y: 1)
             .padding(14)
         }
         .frame(height: 160)
