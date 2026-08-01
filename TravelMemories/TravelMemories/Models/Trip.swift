@@ -3,11 +3,11 @@ import SwiftData
 
 @Model
 final class Trip {
-    var destination: String
-    var startDate: Date
-    var endDate: Date
-    var typeRaw: String
-    var createdAt: Date
+    var destination: String = ""
+    var startDate: Date = Date.now
+    var endDate: Date = Date.now
+    var typeRaw: String = TripType.leisure.rawValue
+    var createdAt: Date = Date.now
     var place: Place?
 
     @Relationship(deleteRule: .cascade, inverse: \TripItem.trip)

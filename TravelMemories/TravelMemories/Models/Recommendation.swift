@@ -3,12 +3,12 @@ import SwiftData
 
 @Model
 final class Recommendation {
-    var name: String
-    var note: String
-    var categoryRaw: String
-    var isFavorite: Bool
+    var name: String = ""
+    var note: String = ""
+    var categoryRaw: String = RecommendationCategory.restaurant.rawValue
+    var isFavorite: Bool = false
     var isVisited: Bool = false
-    var createdAt: Date
+    var createdAt: Date = Date.now
     var place: Place?
 
     var address: String?

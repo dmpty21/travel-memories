@@ -3,11 +3,11 @@ import SwiftData
 
 @Model
 final class TripItem {
-    var name: String
-    var note: String
-    var categoryRaw: String
-    var isCompleted: Bool
-    var createdAt: Date
+    var name: String = ""
+    var note: String = ""
+    var categoryRaw: String = RecommendationCategory.activity.rawValue
+    var isCompleted: Bool = false
+    var createdAt: Date = Date.now
     var trip: Trip?
 
     var category: RecommendationCategory {

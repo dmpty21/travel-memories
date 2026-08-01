@@ -3,9 +3,9 @@ import SwiftData
 
 @Model
 final class Place {
-    var country: String
-    var city: String
-    var createdAt: Date
+    var country: String = ""
+    var city: String = ""
+    var createdAt: Date = Date.now
 
     @Attribute(.externalStorage) var photoData: Data?
 

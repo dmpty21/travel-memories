@@ -3,8 +3,8 @@ import SwiftData
 
 @Model
 final class LogisticsNote {
-    var text: String
-    var createdAt: Date
+    var text: String = ""
+    var createdAt: Date = Date.now
     var place: Place?
 
     init(text: String, place: Place? = nil) {
