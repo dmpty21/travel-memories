@@ -14,7 +14,7 @@ struct CreateProfileView: View {
         VStack(spacing: 28) {
             Spacer()
 
-            StackedMemoriesIcon(size: 88)
+            PeaksMarkIcon(size: 88)
 
             VStack(spacing: 8) {
                 Text("Welcome to Atlas")

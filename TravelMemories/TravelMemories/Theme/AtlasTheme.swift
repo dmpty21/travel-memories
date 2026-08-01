@@ -14,6 +14,9 @@ extension Color {
     static let atlasAccent = Color(red: 0x2f / 255, green: 0x9e / 255, blue: 0x91 / 255)
     static let atlasAccent600 = Color(red: 0x22 / 255, green: 0x7e / 255, blue: 0x74 / 255)
     static let atlasAccent800 = Color(red: 0x17 / 255, green: 0x4a / 255, blue: 0x45 / 255)
+    /// Splash/app-icon gradient stops flanking `atlasAccent800`.
+    static let atlasPineLight = Color(red: 0x1c / 255, green: 0x5a / 255, blue: 0x54 / 255)
+    static let atlasPineDark = Color(red: 0x12 / 255, green: 0x3b / 255, blue: 0x37 / 255)
     static let atlasNeutral500 = Color(red: 0xa9 / 255, green: 0xa5 / 255, blue: 0x9c / 255)
     static let atlasNeutral800 = Color(red: 0x3a / 255, green: 0x37 / 255, blue: 0x2f / 255)
     static let atlasText = Color(red: 0x21 / 255, green: 0x20 / 255, blue: 0x1b / 255)
