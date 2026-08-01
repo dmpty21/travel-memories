@@ -17,6 +17,6 @@ struct TravelMemoriesApp: App {
                 RootTabView()
             }
         }
-        .modelContainer(for: [Place.self, Recommendation.self, LogisticsNote.self])
+        .modelContainer(for: [Place.self, Recommendation.self, LogisticsNote.self, Trip.self, TripItem.self])
     }
 }
