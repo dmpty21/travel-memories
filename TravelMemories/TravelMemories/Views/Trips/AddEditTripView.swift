@@ -8,17 +8,21 @@ struct AddEditTripView: View {
 
     var trip: Trip?
 
+    @Query(sort: [SortDescriptor(\Place.country), SortDescriptor(\Place.city)]) private var places: [Place]
+
     @State private var destination: String = ""
     @State private var startDate: Date = .now
     @State private var endDate: Date = .now
     @State private var type: TripType = .leisure
+    @State private var selectedPlace: Place?
     @StateObject private var searchCompleter = CitySearchCompleter()
     @FocusState private var isDestinationFieldFocused: Bool
 
     private var isEditing: Bool { trip != nil }
 
     private var isValid: Bool {
-        !destination.trimmingCharacters(in: .whitespaces).isEmpty && endDate >= startDate
+        let hasDestination = !destination.trimmingCharacters(in: .whitespaces).isEmpty || selectedPlace != nil
+        return hasDestination && endDate >= startDate
     }
 
     var body: some View {
@@ -57,6 +61,13 @@ struct AddEditTripView: View {
                     }
                 }
                 .pickerStyle(.segmented)
+
+                Picker("Linked Place", selection: $selectedPlace) {
+                    Text("None").tag(Place?.none)
+                    ForEach(places) { place in
+                        Text("\(place.city), \(place.country)").tag(Place?.some(place))
+                    }
+                }
             }
             .navigationTitle(isEditing ? "Edit Trip" : "Add Trip")
             .toolbar {
@@ -74,6 +85,7 @@ struct AddEditTripView: View {
                     startDate = trip.startDate
                     endDate = trip.endDate
                     type = trip.type
+                    selectedPlace = trip.place
                 }
             }
             .onChange(of: startDate) { _, newValue in
@@ -91,15 +103,20 @@ struct AddEditTripView: View {
     }
 
     private func save() {
-        let trimmedDestination = destination.trimmingCharacters(in: .whitespaces)
+        var trimmedDestination = destination.trimmingCharacters(in: .whitespaces)
+        if trimmedDestination.isEmpty, let selectedPlace {
+            trimmedDestination = "\(selectedPlace.city), \(selectedPlace.country)"
+        }
 
         if let trip {
             trip.destination = trimmedDestination
             trip.startDate = startDate
             trip.endDate = endDate
             trip.type = type
+            trip.place = selectedPlace
         } else {
             let newTrip = Trip(destination: trimmedDestination, startDate: startDate, endDate: endDate, type: type)
+            newTrip.place = selectedPlace
             modelContext.insert(newTrip)
         }
         dismiss()
@@ -108,5 +125,5 @@ struct AddEditTripView: View {
 
 #Preview {
     AddEditTripView()
-        .modelContainer(for: [Trip.self, TripItem.self], inMemory: true)
+        .modelContainer(for: [Place.self, Trip.self, TripItem.self], inMemory: true)
 }

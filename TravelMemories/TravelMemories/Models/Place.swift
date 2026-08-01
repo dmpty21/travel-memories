@@ -15,6 +15,9 @@ final class Place {
     @Relationship(deleteRule: .cascade, inverse: \LogisticsNote.place)
     var logisticsNotes: [LogisticsNote] = []
 
+    @Relationship(deleteRule: .nullify, inverse: \Trip.place)
+    var trips: [Trip] = []
+
     init(country: String, city: String) {
         self.country = country
         self.city = city

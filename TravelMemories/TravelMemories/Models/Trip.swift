@@ -8,6 +8,7 @@ final class Trip {
     var endDate: Date
     var typeRaw: String
     var createdAt: Date
+    var place: Place?
 
     @Relationship(deleteRule: .cascade, inverse: \TripItem.trip)
     var items: [TripItem] = []

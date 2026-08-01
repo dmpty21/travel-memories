@@ -24,12 +24,28 @@ struct PlaceDetailView: View {
         place.logisticsNotes.sorted { $0.createdAt < $1.createdAt }
     }
 
+    private var sortedTrips: [Trip] {
+        place.trips.sorted { $0.startDate > $1.startDate }
+    }
+
     var body: some View {
         List {
             if place.photoData != nil {
                 Section {
                     PlacePhotoHeader(place: place)
                         .listRowInsets(EdgeInsets())
+                }
+            }
+
+            if !sortedTrips.isEmpty {
+                Section {
+                    ForEach(sortedTrips) { trip in
+                        NavigationLink(value: trip) {
+                            PlaceTripRow(trip: trip)
+                        }
+                    }
+                } header: {
+                    Label("Trips", systemImage: "airplane.departure")
                 }
             }
 
@@ -82,6 +98,9 @@ struct PlaceDetailView: View {
         .scrollContentBackground(.hidden)
         .background(Color.atlasGround)
         .navigationTitle(place.city)
+        .navigationDestination(for: Trip.self) { trip in
+            TripDetailView(trip: trip)
+        }
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 ShareLink(item: place.shareText) {
@@ -144,10 +163,30 @@ struct PlaceDetailView: View {
     }
 }
 
+private struct PlaceTripRow: View {
+    let trip: Trip
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: trip.type.symbolName)
+                .foregroundStyle(Color.atlasAccent600)
+                .frame(width: 24)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(trip.dateRangeText)
+                    .font(.body)
+                Text(trip.type.displayName)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+}
+
 #Preview {
     let place = Place(country: "Japan", city: "Tokyo")
     return NavigationStack {
         PlaceDetailView(place: place)
     }
-    .modelContainer(for: [Place.self, Recommendation.self, LogisticsNote.self], inMemory: true)
+    .modelContainer(for: [Place.self, Recommendation.self, LogisticsNote.self, Trip.self, TripItem.self], inMemory: true)
 }
