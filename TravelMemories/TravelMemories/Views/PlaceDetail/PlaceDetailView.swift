@@ -26,7 +26,7 @@ struct PlaceDetailView: View {
 
     var body: some View {
         List {
-            if place.photoURL != nil {
+            if place.photoData != nil {
                 Section {
                     PlacePhotoHeader(place: place)
                         .listRowInsets(EdgeInsets())
@@ -128,9 +128,6 @@ struct PlaceDetailView: View {
         }
         .sheet(isPresented: $isPresentingMap) {
             PlaceMapView(place: place)
-        }
-        .task {
-            await place.loadPhotoIfNeeded()
         }
     }
 

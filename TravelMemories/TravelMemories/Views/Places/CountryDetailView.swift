@@ -28,13 +28,10 @@ struct CountryDetailView: View {
                         PhotoCard(
                             title: place.city,
                             subtitle: placeSubtitle(place),
-                            photoURL: place.photoURL
+                            imageData: place.photoData
                         )
                     }
                     .buttonStyle(.plain)
-                    .task {
-                        await place.loadPhotoIfNeeded()
-                    }
                     .contextMenu {
                         Button(role: .destructive) {
                             placeToDelete = place

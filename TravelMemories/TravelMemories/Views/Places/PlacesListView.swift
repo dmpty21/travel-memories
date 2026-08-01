@@ -49,12 +49,9 @@ struct PlacesListView: View {
                             LazyVGrid(columns: columns, spacing: 16) {
                                 ForEach(searchResults) { place in
                                     NavigationLink(value: place) {
-                                        PhotoCard(title: place.city, subtitle: place.country, photoURL: place.photoURL)
+                                        PhotoCard(title: place.city, subtitle: place.country, imageData: place.photoData)
                                     }
                                     .buttonStyle(.plain)
-                                    .task {
-                                        await place.loadPhotoIfNeeded()
-                                    }
                                     .contextMenu {
                                         Button(role: .destructive) {
                                             placeToDelete = place
@@ -76,13 +73,10 @@ struct PlacesListView: View {
                                     PhotoCard(
                                         title: group.country,
                                         subtitle: countrySubtitle(group.places),
-                                        photoURL: group.places.first(where: { $0.photoURL != nil })?.photoURL
+                                        imageData: group.places.first(where: { $0.photoData != nil })?.photoData
                                     )
                                 }
                                 .buttonStyle(.plain)
-                                .task {
-                                    await group.places.first?.loadPhotoIfNeeded()
-                                }
                             }
                         }
                         .padding()

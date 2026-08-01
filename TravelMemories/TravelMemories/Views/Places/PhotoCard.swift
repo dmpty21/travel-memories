@@ -3,7 +3,7 @@ import SwiftUI
 struct PhotoCard: View {
     let title: String
     let subtitle: String
-    let photoURL: String?
+    let imageData: Data?
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
@@ -37,16 +37,12 @@ struct PhotoCard: View {
 
     @ViewBuilder
     private var photo: some View {
-        if let photoURL, let url = URL(string: photoURL) {
-            AsyncImage(url: url) { phase in
-                if case .success(let image) = phase {
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                } else {
-                    placeholder
-                }
-            }
+        if let imageData, let uiImage = UIImage(data: imageData) {
+            Image(uiImage: uiImage)
+                .resizable()
+                .scaledToFill()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .clipped()
         } else {
             placeholder
         }
@@ -67,6 +63,6 @@ struct PhotoCard: View {
 }
 
 #Preview {
-    PhotoCard(title: "Tokyo", subtitle: "12 places", photoURL: nil)
+    PhotoCard(title: "Tokyo", subtitle: "12 places", imageData: nil)
         .padding()
 }
