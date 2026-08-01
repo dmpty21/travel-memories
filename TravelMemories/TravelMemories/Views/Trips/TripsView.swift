@@ -8,6 +8,8 @@ struct TripsView: View {
                 systemImage: "airplane.departure",
                 description: Text("Trip planning is coming soon.")
             )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.atlasGround)
             .navigationTitle("Trips")
         }
     }

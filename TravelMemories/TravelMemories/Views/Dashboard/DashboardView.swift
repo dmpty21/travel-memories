@@ -21,6 +21,13 @@ struct DashboardView: View {
         restaurantRecommendations.filter(\.isVisited).count
     }
 
+    private var recentRecommendations: [Recommendation] {
+        recommendations
+            .sorted { $0.createdAt > $1.createdAt }
+            .prefix(4)
+            .map { $0 }
+    }
+
     private func count(for category: RecommendationCategory) -> Int {
         recommendations.filter { $0.category == category }.count
     }
@@ -28,7 +35,7 @@ struct DashboardView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 28) {
                     header
 
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
@@ -38,11 +45,15 @@ struct DashboardView: View {
                         StatCard(title: "Restaurants Visited", value: visitedRestaurantCount, systemImage: "checkmark.seal.fill")
                     }
 
+                    if !recentRecommendations.isEmpty {
+                        recentSection
+                    }
+
                     categoryBreakdown
                 }
                 .padding()
             }
-            .background(Color(uiColor: .systemGroupedBackground))
+            .background(Color.atlasGround)
             .navigationTitle("Home")
         }
     }
@@ -50,9 +61,24 @@ struct DashboardView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Welcome back")
-                .font(.largeTitle.bold())
+                .font(.system(size: 30, weight: .semibold, design: .rounded))
+                .foregroundStyle(Color.atlasText)
             Text("Your travel footprint so far.")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.atlasNeutral500)
+        }
+    }
+
+    private var recentSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Recent Recommendations")
+                .font(.headline)
+                .foregroundStyle(Color.atlasText)
+
+            VStack(spacing: 10) {
+                ForEach(recentRecommendations) { recommendation in
+                    RecentRecommendationRow(recommendation: recommendation)
+                }
+            }
         }
     }
 
@@ -60,15 +86,17 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("By Category")
                 .font(.headline)
+                .foregroundStyle(Color.atlasText)
 
             VStack(spacing: 0) {
                 ForEach(RecommendationCategory.allCases) { category in
                     HStack {
                         Label(category.displayName, systemImage: category.symbolName)
+                            .foregroundStyle(Color.atlasText)
                         Spacer()
                         Text("\(count(for: category))")
                             .fontWeight(.semibold)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.atlasNeutral500)
                     }
                     .padding(.vertical, 10)
 
@@ -78,7 +106,8 @@ struct DashboardView: View {
                 }
             }
             .padding(.horizontal)
-            .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .padding(.vertical, 4)
+            .background(Color.atlasSurface, in: RoundedRectangle(cornerRadius: AtlasRadius.xl, style: .continuous))
         }
     }
 }
@@ -92,16 +121,44 @@ private struct StatCard: View {
         VStack(alignment: .leading, spacing: 8) {
             Image(systemName: systemImage)
                 .font(.title2)
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(Color.atlasAccent800)
             Text("\(value)")
                 .font(.system(size: 32, weight: .bold, design: .rounded))
+                .foregroundStyle(Color.atlasText)
             Text(title)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.atlasNeutral500)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .background(Color.atlasSurface, in: RoundedRectangle(cornerRadius: AtlasRadius.xl, style: .continuous))
+    }
+}
+
+private struct RecentRecommendationRow: View {
+    let recommendation: Recommendation
+
+    var body: some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 2) {
+                if let place = recommendation.place {
+                    Text(place.city.uppercased())
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(Color.atlasAccent600)
+                        .kerning(0.5)
+                }
+                Text(recommendation.name)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(Color.atlasText)
+                    .lineLimit(1)
+            }
+            Spacer()
+            Image(systemName: recommendation.category.symbolName)
+                .foregroundStyle(Color.atlasNeutral500)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(Color.atlasSurface, in: RoundedRectangle(cornerRadius: AtlasRadius.lg, style: .continuous))
     }
 }
 

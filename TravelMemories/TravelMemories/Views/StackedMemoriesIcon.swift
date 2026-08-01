@@ -2,7 +2,7 @@ import SwiftUI
 
 struct StackedMemoriesIcon: View {
     var size: CGFloat = 120
-    var color: Color = Color(red: 0x3D / 255, green: 0xE3 / 255, blue: 0xCD / 255)
+    var color: Color = .atlasAccent
 
     private var cornerRadius: CGFloat { size * (14.0 / 104.0) }
 

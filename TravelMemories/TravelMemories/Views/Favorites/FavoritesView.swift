@@ -28,8 +28,11 @@ struct FavoritesView: View {
                                         .foregroundStyle(.secondary)
                                 }
                             }
+                            .listRowBackground(Color.atlasSurface)
                         }
                     }
+                    .scrollContentBackground(.hidden)
+                    .background(Color.atlasGround)
                 }
             }
             .navigationTitle("Favorites")

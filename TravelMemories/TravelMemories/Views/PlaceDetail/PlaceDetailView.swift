@@ -79,6 +79,8 @@ struct PlaceDetailView: View {
                 Label("Logistics Notes", systemImage: "airplane")
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(Color.atlasGround)
         .navigationTitle(place.city)
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
