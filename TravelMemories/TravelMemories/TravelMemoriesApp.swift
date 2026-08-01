@@ -16,14 +16,14 @@ struct TravelMemoriesApp: App {
                     }
                 }
             } else {
-                RootTabView()
+                AppRootView()
             }
         }
         .modelContainer(Self.modelContainer)
     }
 
     private static func makeModelContainer() -> ModelContainer {
-        let schema = Schema([Place.self, Recommendation.self, LogisticsNote.self, Trip.self, TripItem.self])
+        let schema = Schema([Place.self, Recommendation.self, LogisticsNote.self, Trip.self, TripItem.self, Profile.self])
 
         let cloudConfiguration = ModelConfiguration(schema: schema, cloudKitDatabase: .automatic)
         if let container = try? ModelContainer(for: schema, configurations: [cloudConfiguration]) {
