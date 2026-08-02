@@ -13,6 +13,9 @@ final class Trip {
     @Relationship(deleteRule: .cascade, inverse: \TripItem.trip)
     var items: [TripItem]?
 
+    @Relationship(deleteRule: .cascade, inverse: \Reservation.trip)
+    var reservations: [Reservation]?
+
     var type: TripType {
         get { TripType(rawValue: typeRaw) ?? .leisure }
         set { typeRaw = newValue.rawValue }
