@@ -39,13 +39,19 @@ struct PlaceMapView: View {
                                         longitude: recommendation.longitude!
                                     )
                                 )
-                                .tint(recommendation.isFavorite ? .yellow : .teal)
+                                .tint(recommendation.isVisited ? .green : .teal)
                                 .tag(recommendation.id)
                             }
                         }
                         .mapControls {
                             MapCompass()
                             MapPitchToggle()
+                        }
+
+                        VStack {
+                            MapLegend()
+                                .padding(.top, 8)
+                            Spacer()
                         }
 
                         if let selectedRecommendation {
@@ -87,6 +93,29 @@ struct PlaceMapView: View {
             longitudeDelta: max((maxLon - minLon) * 1.6, 0.02)
         )
         return MKCoordinateRegion(center: center, span: span)
+    }
+}
+
+private struct MapLegend: View {
+    var body: some View {
+        HStack(spacing: 16) {
+            legendItem(color: .teal, label: "On the List")
+            legendItem(color: .green, label: "Visited")
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .background(.regularMaterial, in: Capsule())
+        .shadow(radius: 4)
+    }
+
+    private func legendItem(color: Color, label: String) -> some View {
+        HStack(spacing: 6) {
+            Circle()
+                .fill(color)
+                .frame(width: 10, height: 10)
+            Text(label)
+                .font(.caption.weight(.medium))
+        }
     }
 }
 
