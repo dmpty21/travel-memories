@@ -13,7 +13,15 @@ struct PlaceDetailView: View {
     @State private var isPresentingMap = false
 
     private var groupedRecommendations: [(category: RecommendationCategory, items: [Recommendation])] {
-        let groups = Dictionary(grouping: place.recommendations ?? [], by: \.category)
+        groupedRecommendations(for: (place.recommendations ?? []).filter(\.isVisited))
+    }
+
+    private var onTheListRecommendations: [Recommendation] {
+        (place.recommendations ?? []).filter { !$0.isVisited }.sorted { $0.name < $1.name }
+    }
+
+    private func groupedRecommendations(for items: [Recommendation]) -> [(category: RecommendationCategory, items: [Recommendation])] {
+        let groups = Dictionary(grouping: items, by: \.category)
         return RecommendationCategory.allCases.compactMap { category in
             guard let items = groups[category], !items.isEmpty else { return nil }
             return (category, items.sorted { $0.name < $1.name })
@@ -57,6 +65,20 @@ struct PlaceDetailView: View {
                     Label("Recommendations", systemImage: "list.bullet")
                 }
             } else {
+                if !onTheListRecommendations.isEmpty {
+                    Section {
+                        ForEach(onTheListRecommendations) { recommendation in
+                            RecommendationRow(recommendation: recommendation)
+                                .onTapGesture { recommendationToEdit = recommendation }
+                        }
+                        .onDelete { offsets in
+                            delete(recommendationsInGroup: onTheListRecommendations, at: offsets)
+                        }
+                    } header: {
+                        Label("On the List", systemImage: "list.bullet")
+                    }
+                }
+
                 ForEach(groupedRecommendations, id: \.category) { group in
                     Section {
                         ForEach(group.items) { recommendation in

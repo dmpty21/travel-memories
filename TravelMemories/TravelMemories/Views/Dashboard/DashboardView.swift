@@ -4,6 +4,15 @@ import SwiftData
 struct DashboardView: View {
     @Query private var places: [Place]
     @Query private var recommendations: [Recommendation]
+    @Query private var profiles: [Profile]
+    @Query(sort: \Trip.startDate) private var trips: [Trip]
+
+    private var greeting: String {
+        guard let name = profiles.first?.name.trimmingCharacters(in: .whitespaces), !name.isEmpty else {
+            return "Welcome back"
+        }
+        return "Hi, \(name)"
+    }
 
     private var countryCount: Int {
         Set(places.map(\.country)).count
@@ -21,11 +30,8 @@ struct DashboardView: View {
         restaurantRecommendations.filter(\.isVisited).count
     }
 
-    private var recentRecommendations: [Recommendation] {
-        recommendations
-            .sorted { $0.createdAt > $1.createdAt }
-            .prefix(4)
-            .map { $0 }
+    private var upcomingTrips: [Trip] {
+        trips.filter(\.isUpcoming).sorted { $0.startDate < $1.startDate }
     }
 
     private func count(for category: RecommendationCategory) -> Int {
@@ -38,15 +44,15 @@ struct DashboardView: View {
                 VStack(alignment: .leading, spacing: 28) {
                     header
 
+                    if !upcomingTrips.isEmpty {
+                        upcomingTripsSection
+                    }
+
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
                         StatCard(title: "Countries", value: countryCount, systemImage: "globe.americas.fill")
                         StatCard(title: "Cities", value: cityCount, systemImage: "building.2.fill")
                         StatCard(title: "Restaurants Added", value: restaurantRecommendations.count, systemImage: "fork.knife")
                         StatCard(title: "Restaurants Visited", value: visitedRestaurantCount, systemImage: "checkmark.seal.fill")
-                    }
-
-                    if !recentRecommendations.isEmpty {
-                        recentSection
                     }
 
                     categoryBreakdown
@@ -55,12 +61,15 @@ struct DashboardView: View {
             }
             .background(Color.atlasGround)
             .navigationTitle("Home")
+            .navigationDestination(for: Trip.self) { trip in
+                TripDetailView(trip: trip)
+            }
         }
     }
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Welcome back")
+            Text(greeting)
                 .font(.system(size: 30, weight: .semibold, design: .rounded))
                 .foregroundStyle(Color.atlasText)
             Text("Your travel footprint so far.")
@@ -68,15 +77,18 @@ struct DashboardView: View {
         }
     }
 
-    private var recentSection: some View {
+    private var upcomingTripsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Recent Recommendations")
+            Text("Upcoming Trips")
                 .font(.headline)
                 .foregroundStyle(Color.atlasText)
 
             VStack(spacing: 10) {
-                ForEach(recentRecommendations) { recommendation in
-                    RecentRecommendationRow(recommendation: recommendation)
+                ForEach(upcomingTrips) { trip in
+                    NavigationLink(value: trip) {
+                        UpcomingTripRow(trip: trip)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
@@ -135,25 +147,29 @@ private struct StatCard: View {
     }
 }
 
-private struct RecentRecommendationRow: View {
-    let recommendation: Recommendation
+private struct UpcomingTripRow: View {
+    let trip: Trip
 
     var body: some View {
         HStack(spacing: 12) {
+            Image(systemName: trip.type.symbolName)
+                .foregroundStyle(Color.atlasAccent600)
+                .frame(width: 24)
+
             VStack(alignment: .leading, spacing: 2) {
-                if let place = recommendation.place {
-                    Text(place.city.uppercased())
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(Color.atlasAccent600)
-                        .kerning(0.5)
-                }
-                Text(recommendation.name)
+                Text(trip.destination)
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(Color.atlasText)
                     .lineLimit(1)
+                Text(trip.dateRangeText)
+                    .font(.caption)
+                    .foregroundStyle(Color.atlasNeutral500)
             }
+
             Spacer()
-            Image(systemName: recommendation.category.symbolName)
+
+            Image(systemName: "chevron.right")
+                .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.atlasNeutral500)
         }
         .padding(.horizontal, 14)
@@ -164,5 +180,5 @@ private struct RecentRecommendationRow: View {
 
 #Preview {
     DashboardView()
-        .modelContainer(for: [Place.self, Recommendation.self, LogisticsNote.self], inMemory: true)
+        .modelContainer(for: [Place.self, Recommendation.self, LogisticsNote.self, Trip.self, TripItem.self, Profile.self], inMemory: true)
 }
