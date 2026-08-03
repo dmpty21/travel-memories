@@ -1,3 +1,98 @@
+# Handoff — 2026-08-03 session
+
+## App Store submission status
+
+Picking up mid-submission. Where things stand now:
+
+1. **Build archived and uploaded** — Diego archived the app in Xcode
+   (Product ▸ Archive on the "Any iOS Device" destination) and uploaded it
+   to App Store Connect via Organizer ▸ Distribute App ▸ App Store Connect
+   ▸ Upload, with automatic signing. Upload succeeded; build should show up
+   under the app's TestFlight/Build section once Apple finishes processing.
+2. **App Store screenshots generated** — captured from simulator, populated
+   with realistic sample data (Paris, Tokyo, Rome, Mexico City, New York
+   trips/places/recommendations) rather than an empty new-install state.
+   Two sizes were needed — App Store Connect rejected the first set with
+   "dimensions are wrong" for the **"6.5\" Display" slot**, which actually
+   wants legacy resolutions, not the newest 6.9" size:
+   - `1320×2868` (6.9", iPhone 17 Pro Max simulator) — for the 6.9" slot.
+   - `1284×2778` (App Store Connect's "6.5\" Display" slot — this is
+     actually the iPhone **13** Pro Max / 12 Pro Max resolution, *not*
+     14 Pro Max, which renders at 1290×2796 and does NOT match). Had to
+     create an `iPhone 13 Pro Max` simulator specifically
+     (`xcrun simctl create "iPhone 13 Pro Max" ...iPhone-13-Pro-Max`) to
+     get pixel-exact screenshots — resizing/stretching the 6.9" set was
+     considered but avoided to prevent distortion.
+   Both sets uploaded successfully. **If more screenshots are needed later,
+   check App Store Connect's screenshot page first for every required size
+   slot** (there may be more than 6.9"/6.5" depending on how the listing is
+   configured) rather than discovering them one rejection at a time.
+3. **App Store Connect metadata — all completed**:
+   - Age Rating questionnaire (App Information page) — answered "None" to
+     everything, landed at 4+.
+   - Content Rights Information — "No third-party content."
+   - Contact Information — filled in.
+   - Copyright — set to `2026 DM` (Diego's choice, to avoid using his full
+     name; Apple doesn't require a legal name here).
+   - Support URL — didn't exist yet, so a new page was created and pushed:
+     [`docs/support.html`](docs/support.html), live at
+     `https://dmpty21.github.io/travel-memories/support.html` (same visual
+     style as the existing privacy policy page). Committed separately in
+     40902bd, already pushed before this session's other changes.
+   - App Privacy questionnaire — answered "No, we do not collect data",
+     accurate given no servers/analytics/ads and CloudKit-only storage in
+     the user's own private database.
+   - **Sign-In Required toggle** (App Review Information section) was
+     unexpectedly on, causing "User name"/"Password required" errors —
+     Atlas has no accounts/login at all, so this was switched **off**.
+4. **Result**: all "Unable to Add for Review" blockers cleared. Diego
+   confirmed everything is done on the App Store Connect side as of this
+   session — next real-world event is Apple's review outcome, which isn't
+   something to check from this repo/session.
+
+## Known issue: synthetic taps on custom SwiftUI Buttons don't register
+
+This bit us again this session (previously noted 2026-08-01, see below).
+On this environment's iOS 17 Pro Max simulator (iOS 26), **no** synthetic
+tap — not the onboarding "Continue" button, not the TabView's own tab
+items — reliably triggered a `Button` action closure, even with
+press-and-hold `touch_path`. TextField focus and typing worked fine; only
+`Button` taps failed. A background research task was flagged to look into
+whether this is a known `simctl`/iOS 26 event-injection issue, but no fix
+was in hand this session.
+
+**Workaround used**: added small **DEBUG-only** dev hooks so screenshots
+could be generated without relying on taps:
+- [`Debug/SampleDataSeeder.swift`](TravelMemories/TravelMemories/Debug/SampleDataSeeder.swift)
+  — populates realistic sample Places/Trips/Recommendations when launched
+  with `-SeedSampleData`. Fully wrapped in `#if DEBUG`; compiled out of
+  Release/App Store builds entirely.
+- [`TravelMemoriesApp.swift`](TravelMemories/TravelMemories/TravelMemoriesApp.swift)
+  — calls the seeder from a `#if DEBUG`-gated `.task`.
+- [`RootTabView.swift`](TravelMemories/TravelMemories/Views/RootTabView.swift)
+  — added a `selection` binding to the `TabView` so a tab can be selected
+  by value; a `#if DEBUG`-gated `.onAppear` reads `-ScreenshotTab <name>`
+  from launch arguments to jump straight to a tab. The `selection` state
+  and `Tab(value:)` wiring itself is *not* DEBUG-gated (harmless in
+  Release — behaves identically to the previous unselected TabView) but
+  the jump-to-tab logic only compiles in Debug.
+
+**Kept and committed** at Diego's request, for reuse next time screenshots
+are needed. If you'd rather strip this dev-only tooling out later:
+
+```bash
+git checkout -- TravelMemories/TravelMemories/TravelMemoriesApp.swift TravelMemories/TravelMemories/Views/RootTabView.swift
+rm -rf TravelMemories/TravelMemories/Debug
+```
+
+## Build/run reference (unchanged)
+
+```bash
+xcodebuild -scheme TravelMemories -configuration Debug -sdk iphonesimulator build
+```
+
+---
+
 # Handoff — 2026-08-01 session
 
 ## What shipped this session

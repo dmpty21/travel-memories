@@ -17,6 +17,9 @@ struct TravelMemoriesApp: App {
                 }
             } else {
                 AppRootView()
+                    #if DEBUG
+                    .task { SampleDataSeeder.seedIfNeeded(context: Self.modelContainer.mainContext) }
+                    #endif
             }
         }
         .modelContainer(Self.modelContainer)
